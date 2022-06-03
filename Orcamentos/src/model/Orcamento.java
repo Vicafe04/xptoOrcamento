@@ -106,4 +106,15 @@ public class Orcamento {
 				&& Objects.equals(produto, other.produto);
 	}
 
+	@Override
+	public String toString() {
+		return id + "\t" + fornecedor + "\t" +  produto + "\t" 
+				+  preco + "\t" + maisBarato + "\n" ;
+	}
+
+	public String toCSV() {
+		return id + ";" + fornecedor + ";" + produto + ";" + String.format("%.2f", preco) + ";"
+				+ maisBarato + "\r\n";
+	}
+
 }

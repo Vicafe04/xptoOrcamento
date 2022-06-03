@@ -12,13 +12,14 @@ public class OrcamentoProcess {
 	
 	public static void abrir() {
 		orcamentos = od.ler();
-		if(orcamentos.size() == 0) {
-			orcamentos.add(new Orcamento());
-		}
 	}
 	
 	public static void salvar() {
 		od.escrever(orcamentos);
 	}
+	
+	public static void carregar() {
+		orcamentos = new ArrayList<>();
 
+	}
 }

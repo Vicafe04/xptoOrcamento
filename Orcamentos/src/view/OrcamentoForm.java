@@ -4,14 +4,18 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Currency;
 import java.util.Locale;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -25,14 +29,14 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 	private JLabel id, fornecedor, produto, preco;
 	private JTextField tfId, tfFornecedor, tfProduto, tfPreco;
 	private JTextArea verResultados;
+	private JScrollPane rolagem;
 	private JButton create, read, update, delete;
 	private String texto = "";
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private final Locale BRASIL = new Locale("pt", "BR");
 	private DecimalFormat df = new DecimalFormat("#.00");
-	private int autoId;
-	//= OrcamentoProcess.orcamentos.get(OrcamentoProcess.orcamentos.size()-1).getId() + 1;
+	private int autoId = OrcamentoProcess.orcamentos.get(OrcamentoProcess.orcamentos.size()-1).getId() + 1;
 	
 	OrcamentoForm(){
 		setTitle("Orçamento");
@@ -68,6 +72,13 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 		tfPreco = new JTextField();
 		tfPreco.setBounds(110, 125, 155, 30);
 		painel.add(tfPreco);
+		verResultados = new JTextArea();
+		verResultados.setEditable(false);
+		verResultados.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+		preencherAreaDeTexto();
+		rolagem = new JScrollPane(verResultados);	
+		rolagem.setBounds(20, 340, 740, 200);
+		painel.add(rolagem);
 		
 		create = new JButton("Cadastrar");
 		read = new JButton("Buscar");
@@ -83,11 +94,11 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 		painel.add(read);
 		painel.add(update);
 		painel.add(delete);
-
-		verResultados = new JTextArea();
-		verResultados.setEditable(false);
-		verResultados.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
-		preencherAreaDeTexto();
+		
+		create.addActionListener(this);
+		read.addActionListener(this);
+		update.addActionListener(this);
+		delete.addActionListener(this);
 	}
 
 	private void preencherAreaDeTexto() {
@@ -96,18 +107,43 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 		}
 		verResultados.setText(texto);
 	}
-		
 	
+	private void limparCampos() {
+		tfId.setText(String.format("%d",autoId));
+		tfFornecedor.setText(null);
+		tfProduto.setText(null);
+		tfPreco.setText(null);
+	}
+		
+	 private void cadastrar()throws NumberFormatException, ParseException{
+	    	if (tfFornecedor.getText().length() !=0 && tfProduto.getText().length() !=0 && tfPreco.getText().length() != 0) {
+	    		OrcamentoProcess.orcamentos.add(new Orcamento(autoId,tfFornecedor.getText().toString(),tfProduto.getText().toString(),Double.parseDouble(tfPreco.getText().toString()),false));
+	    		
+	    		 autoId++;
+					
+	    	}else {
+	    		JOptionPane.showMessageDialog(this, "Favor Preencher todos as informações");
+	    	}
+	    	limparCampos();
+			preencherAreaDeTexto();
+			OrcamentoProcess.salvar();
+	    }
 
 	public static void main(String[] args) {
+		OrcamentoProcess.abrir();
 		new OrcamentoForm().setVisible(true);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-//		if (e.getSource() == create) {
-//			cadastrar();
-//		}
+		if (e.getSource() == create) {
+			try {
+				cadastrar();
+			} catch (NumberFormatException | ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 //		if (e.getSource() == read) {
 //			buscar();
 //		}
@@ -119,5 +155,4 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 //		}
 		
 	}
-
 }

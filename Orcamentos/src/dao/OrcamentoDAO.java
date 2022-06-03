@@ -36,7 +36,7 @@ public class OrcamentoDAO {
 		return linhas;
 	}
 
-	public void escrever(ArrayList<Orcamento> orcamentos) {
+	public void escrever(ArrayList<Orcamento> linhas) {
 		try {
 			bw = new BufferedWriter(new FileWriter(path));
 			for (Orcamento o : linhas) {

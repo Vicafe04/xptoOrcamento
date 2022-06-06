@@ -31,20 +31,20 @@ public class OrcamentoDAO {
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado."+e);
 		} catch (IOException e) {
-			System.out.println(" Arquivo provavelmente está aberto."+e);
+			System.out.println("Arquivo provavelmente está aberto."+e);
 		}
 		return linhas;
 	}
 
-	public void escrever(ArrayList<Orcamento> linhas) {
+	public void escrever (ArrayList<Orcamento> linhas) {
 		try {
-			bw = new BufferedWriter(new FileWriter(path));
-			for (Orcamento o : linhas) {
-				bw.write(o.toCSV());
-			}
-			bw.close();
-		} catch (IOException e) {
-			System.out.println(" Arquivo provavelmente está aberto."+e);
+		bw = new BufferedWriter(new FileWriter(path));
+		for (Orcamento l : linhas) {
+			bw.write(l.toCSV());
 		}
+		bw.close();
+	}catch(IOException e) {
+		System.out.println(e);
 	}
+}
 }

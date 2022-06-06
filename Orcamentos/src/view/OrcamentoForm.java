@@ -32,11 +32,12 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 	private JScrollPane rolagem;
 	private JButton create, read, update, delete;
 	private String texto = "";
+	private int autoId = OrcamentoProcess.orcamentos.size() + 1;
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private final Locale BRASIL = new Locale("pt", "BR");
 	private DecimalFormat df = new DecimalFormat("#.00");
-	private int autoId = OrcamentoProcess.orcamentos.get(OrcamentoProcess.orcamentos.size()-1).getId() + 1;
+	
 	
 	OrcamentoForm(){
 		setTitle("Orçamento");
@@ -102,6 +103,7 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 	}
 
 	private void preencherAreaDeTexto() {
+		texto = "";
 		for (Orcamento o : OrcamentoProcess.orcamentos) {
 			texto += o.toString();
 		}
@@ -114,6 +116,12 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 		tfProduto.setText(null);
 		tfPreco.setText(null);
 	}
+	
+	public void comparar() {
+		for (Orcamento orcamento  : OrcamentoProcess.orcamentos) {
+			OrcamentoProcess.compararProdutos(orcamento.getProduto());
+		}
+	}
 		
 	 private void cadastrar()throws NumberFormatException, ParseException{
 	    	if (tfFornecedor.getText().length() !=0 && tfProduto.getText().length() !=0 && tfPreco.getText().length() != 0) {
@@ -122,12 +130,100 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 	    		 autoId++;
 					
 	    	}else {
-	    		JOptionPane.showMessageDialog(this, "Favor Preencher todos as informações");
+	    		JOptionPane.showMessageDialog(this, "Preencha todos os campos");
 	    	}
 	    	limparCampos();
+	    	comparar();
 			preencherAreaDeTexto();
 			OrcamentoProcess.salvar();
+			
 	    }
+	 public void buscar() {
+			String entrada = JOptionPane.showInputDialog( this,"Digite o id do orçamento");
+		
+			boolean isNumeric = true;
+			if(entrada != null) {
+				for (int i = 0; i < entrada.length(); i++) {
+					if(!Character.isDigit(entrada.charAt(i))) {
+						isNumeric = false;
+					}
+				}
+				
+			}else {
+				isNumeric = false;
+			}
+			if (isNumeric) {
+				int id = Integer.parseInt(entrada);
+				
+				boolean achou = false;
+				for (Orcamento orca : OrcamentoProcess.orcamentos) {
+					if (orca.getId() == id) {
+						achou = true;
+						int indice = OrcamentoProcess.orcamentos.indexOf(orca);
+						tfId.setText(OrcamentoProcess.orcamentos.get(indice).getId("s"));
+					tfFornecedor.setText(OrcamentoProcess.orcamentos.get(indice).getFornecedor());
+						tfProduto.setText(OrcamentoProcess.orcamentos.get(indice).getProduto());
+						tfPreco.setText(OrcamentoProcess.orcamentos.get(indice).getPreco("s"));
+						OrcamentoProcess.salvar();
+						create.setEnabled(true);
+						update.setEnabled(true);
+						delete.setEnabled(true);
+						break;
+					}
+				}
+				
+				if (!achou) {
+					JOptionPane.showMessageDialog(this, "Não encontrado");
+				}
+			}
+		}
+	 public void deletar() {
+			
+			int id = Integer.parseInt(tfId.getText());
+			 int indice = -1;
+			for(Orcamento o : OrcamentoProcess.orcamentos) {
+				if (o.getId() == id) {
+					indice = OrcamentoProcess.orcamentos.indexOf(o);
+		}
+			}
+			OrcamentoProcess.orcamentos.remove(indice);
+			comparar();
+			preencherAreaDeTexto();
+			limparCampos();
+			create.setEnabled(true);
+			update.setEnabled(false);
+			delete.setEnabled(true);
+			read.setEnabled(true);
+			OrcamentoProcess.salvar();
+			tfId.setText(String.format("%d", OrcamentoProcess.orcamentos.size() + 1));
+		
+	}
+	 
+	 private void alterar() {
+			int id = Integer.parseInt(tfId.getText());
+			int indice = -1;
+			for(Orcamento alt : OrcamentoProcess.orcamentos) {
+				if(alt.getId() == id) {
+					indice = OrcamentoProcess.orcamentos.indexOf(alt);
+				}
+			}
+			if (tfId.getText().length() != 0 && tfProduto.getText().length() != 0) {
+
+				OrcamentoProcess.orcamentos.set(indice, new Orcamento(id, tfFornecedor.getText(), tfProduto.getText(),
+						Double.parseDouble(tfPreco.getText().toString()), false));
+				comparar();
+				preencherAreaDeTexto();
+				limparCampos();
+			} else {
+				JOptionPane.showMessageDialog(this, "Favor preencher todos os campos.");
+			}
+			create.setEnabled(true);
+			update.setEnabled(true);
+			delete.setEnabled(false);
+			tfId.setText(String.format("%d", OrcamentoProcess.orcamentos.size() + 1));
+			OrcamentoProcess.salvar();
+		}
+	 
 
 	public static void main(String[] args) {
 		OrcamentoProcess.abrir();
@@ -137,22 +233,25 @@ public class OrcamentoForm extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == create) {
-			try {
-				cadastrar();
-			} catch (NumberFormatException | ParseException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+				try {
+					cadastrar();
+				} catch (NumberFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 		}
-//		if (e.getSource() == read) {
-//			buscar();
-//		}
-//		if (e.getSource() == update) {
-//			alterar();
-//		}
-//		if (e.getSource() == delete) {
-//			excluir();
-//		}
+		if (e.getSource() == read) {
+			buscar();
+		}
+		if (e.getSource() == update) {
+			alterar();
+		}
+		if (e.getSource() == delete) {
+			deletar();
+		}
 		
 	}
 }

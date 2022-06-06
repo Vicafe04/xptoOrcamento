@@ -1,2 +1,3 @@
-1;AMD;Ryzen(top);1000,00;false
-2;a;b;1,00;false
+1;AMD;Ryzen(top);1000.0;false
+2;AMD;Ryzen(top);400.0;false
+3;AMD;Ryzen(top);200.0;true

@@ -18,9 +18,7 @@ public class Orcamento {
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	private DecimalFormat df = new DecimalFormat("#.00");
 
-	public Orcamento(int id) {
-		this.id = id;
-	}
+	
 
 	public Orcamento(int id, String fornecedor, String produto, double preco, boolean maisBarato) {
 		this.id = id;
@@ -31,7 +29,6 @@ public class Orcamento {
 	}
 	
 	public Orcamento(String linha) {
-		df.setCurrency(Currency.getInstance(BRASIL));
 		this.id = Integer.parseInt(linha.split(";")[0]);
 		this.fornecedor = linha.split(";")[1];
 		this.produto = linha.split(";")[2];
@@ -74,7 +71,11 @@ public class Orcamento {
 	public double getPreco() {
 		return preco;
 	}
-
+	
+	public String getPreco(String s) {
+		return String.format("%.0f", preco);
+	}
+	
 	public void setPreco(double preco) {
 		this.preco = preco;
 	}
@@ -113,7 +114,7 @@ public class Orcamento {
 	}
 
 	public String toCSV() {
-		return id + ";" + fornecedor + ";" + produto + ";" + String.format("%.2f", preco) + ";"
+		return id + ";" + fornecedor + ";" + produto + ";" + preco + ";"
 				+ maisBarato + "\r\n";
 	}
 
